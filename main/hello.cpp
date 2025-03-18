@@ -1,10 +1,34 @@
-//File: hello.cpp
-#include <iostream>
-using namespace std;
-
-int main(void) {
-  cout << "Hello, World\n";
-  cout << "Hello, Jenkins\n";
-  cout << "I have successfully built and run this  \n";
-  return 0;
+pipeline {
+    agent any
+    stages {
+        stage('Clone repository') {
+            steps {
+                checkout([$class: 'GitSCM', 
+                    branches: [[name: 'main']], 
+                    userRemoteConfigs: [[url: 'https://github.com/mishuj04/PES1UG22CS074.git']]
+                ])
+            }
+        }
+        stage('Build') {
+            steps {
+                build 'PES1UG22CS106-1'
+                sh 'g++ ./main/hello.cpp -o ./output'
+            }
+        }
+        stage('Test') {
+            steps {
+                sh './output'
+            }
+        }
+        stage('Deploy') {
+            steps {
+                echo 'deploy'
+            }
+        }
+    }
+    post {
+        failure {
+            error 'Pipeline failed'
+        }
+    }
 }
